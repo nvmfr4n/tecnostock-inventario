@@ -1,74 +1,65 @@
-/* 1. Configuración del fondo de toda la pantalla */
-body
-{
-    font-family: Arial, sans-serif;   /* Tipo de letra */
-    background-color: #f0f2f5;      /* Un gris claro */
-    display: flex;                    /* Esto activa el modo flexible para centrar cosas */
-    justify-content: center;          /* Centra la caja horizontalmente */
-    align-items: center;              /* Centra la caja verticalmente */
-    height: 100vh;                    /* Le decimos que ocupe el 100% de la altura de la pantalla */
-    margin: 0;                        /* Quitamos los márgenes por defecto del navegador */
+/* configuración del fondo de toda la pantalla */
+body {
+    font-family: Arial, sans-serif;   
+    background-color: #f0f2f5;      
+    display: flex;                    
+    justify-content: center;          
+    align-items: center;              
+    height: 100vh;                    
+    margin: 0;                        
 }
 
-/* 2. Diseño de la caja blanca del formulario */
-form
-{
+/* diseño de la caja blanca del formulario */
+form {
     background-color: white;
-    padding: 40px;                                  /* Espacio interno para que no quede apretado */
-    border-radius: 10px;                            /* Redondea las esquinas de la caja */
-    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);  /* Le da una sombra suave */
-    width: 320px;                                   /* El ancho de nuestra caja de login */
-    text-align: center;                             /* Centra todos los textos por dentro */
+    padding: 40px;                                  
+    border-radius: 10px;                            
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);  
+    width: 320px;                                   
+    text-align: center;                             
 }
 
-/* 3. Estilo para los textos y títulos dentro del formulario */
-h2
-{
+/* estilo para los textos y títulos dentro del formulario */
+h2 {
     color: #333333;
     margin-bottom: 5px;
 }
 
-p
-{
+p {
     color: #666666;
     margin-bottom: 20px;
     font-size: 14px;
 }
 
-/* 4. Estilo para las cajas donde el usuario escribe (inputs) */
-input
-{
-    width: 100%;                                    /* Ocupan todo el ancho disponible */
-    padding: 10px;                                  /* Las hace un poco más gorditas y cómodas */
+/* estilo para las cajas donde el usuario escribe */
+input {
+    width: 100%;                                    
+    padding: 10px;                                  
     margin-top: 5px;
     margin-bottom: 15px;
-    border: 1px solid #cccccc;                    /* Borde gris claro */
-    border-radius: 5px;                             /* Esquinas ligeramente redondas */
-    box-sizing: border-box;                         /* Evita que el padding rompa el tamaño */
+    border: 1px solid #cccccc;                    
+    border-radius: 5px;                             
+    box-sizing: border-box;                         
 }
 
-/* 5. Estilo para el botón de ingresar */
-button
-{
+/* estilo para el botón de ingresar */
+button {
     width: 100%;
     padding: 12px;
-    background-color: #0d6efd;                      /* Color azul */
-    color: white;                                   /* Texto del botón en blanco */
+    background-color: #0d6efd;                      
+    color: white;                                   
     border: none;
     border-radius: 5px;
     font-weight: bold;
-    cursor: pointer;                                  /* Hace que el mouse cambie a una manito */
+    cursor: pointer;                                  
 }
 
-/* 6. Qué pasa cuando pasamos el mouse por encima del botón */
-button:hover
-{
-    background-color: #0b5ed7;                      /* Azul un poco más oscuro */
+/* comportamiento al pasar el mouse por encima del botón */
+button:hover {
+    background-color: #0b5ed7;                      
 }
 
-/* --- ESTILOS DEL PANEL DE CONTROL (INICIO.PHP) --- */
-
-/* Menú de navegación */
+/* estilos del menú de navegación superior */
 .menu-superior {
     background-color: #0d6efd;
     color: white;
@@ -108,14 +99,14 @@ button:hover
     color: white !important;
 }
 
-/* Contenido del Panel */
+/* contenido central del panel */
 .contenedor-panel {
     padding: 40px;
     max-width: 1000px;
-    margin: 0 auto; /* Centra el contenido */
+    margin: 0 auto; 
 }
 
-/* Tarjetas de resumen simuladas */
+/* tarjetas de resumen simuladas */
 .tarjetas-resumen {
     display: flex;
     gap: 20px;
@@ -127,7 +118,7 @@ button:hover
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    flex: 1; /* Para que ocupen el mismo ancho */
+    flex: 1; 
     text-align: center;
 }
 
@@ -138,10 +129,166 @@ button:hover
     margin-top: 10px;
 }
 
-/* Anular el centrado del login para el Panel de Control */
+/* anula el centrado del login para permitir scroll en el panel */
 body.body-panel {
     display: block;
     height: auto;
     margin: 0;
-    background-color: #f4f7f6; /* Mantener el color de fondo gris claro */
+    background-color: #f4f7f6; 
+}
+
+/* estilos del formulario secundario */
+.formulario-producto {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 20px auto;
+}
+
+.formulario-producto label {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.formulario-producto input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.btn-guardar {
+    margin-top: 25px;
+    background-color: #0d6efd;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-guardar:hover {
+    background-color: #0b5ed7;
+}
+
+.alerta-exito {
+    background-color: #d1e7dd;
+    color: #0f5132;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.alerta-error {
+    background-color: #f8d7da;
+    color: #842029;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* estilos de la tabla del inventario */
+.tabla-inventario {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.tabla-inventario th, .tabla-inventario td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabla-inventario th {
+    background-color: #0d6efd;
+    color: white;
+    font-weight: bold;
+}
+
+.tabla-inventario tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* indicador visual rojo de bajo stock */
+.alerta-stock {
+    background-color: #f8d7da !important;
+    color: #842029;
+    font-weight: bold;
+}
+
+/* botones de acción en la tabla */
+.btn-editar {
+    background-color: #ffc107;
+    color: #000;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.btn-desactivar {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* estilos del buscador superior */
+.formulario-buscador {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+    flex-direction: row;
+}
+
+.formulario-buscador input {
+    flex: 1;
+    margin: 0;
+    padding: 10px 15px;
+}
+
+.btn-buscar {
+    width: auto;
+    margin: 0;
+    padding: 10px 20px;
+}
+
+.btn-limpiar {
+    background-color: #6c757d;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.btn-limpiar:hover {
+    background-color: #5a6268;
+    color: white;
 }

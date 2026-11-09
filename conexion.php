@@ -1,21 +1,23 @@
 <?php
 
-//variables
+// datos para conectar a la base de datos local
 $servidor = "localhost";
-$usuario = "root";              //usuario inicial por XAMPP (obligatorio)
+$usuario = "root";
 $contrasena = "";
 $base_de_datos = "tecnostock"; 
 
-$conexion_sql = new mysqli($servidor, $usuario, $contrasena, $base_de_datos); //conexión de programa a base de datos SQL
-
-//código para saber si conecta o no
-if($conexion_sql -> connect_error)
+try
 {
-    die("error de conexion". $conexion_sql -> connect_error);  //si hay algún error mostrará error de conexión
-}
-else
-{
-    //echo "se conectó a la base de datos :)";
-}
+    // conecta usando pdo para mayor seguridad y acepta caracteres especiales
+    $conexion_sql = new PDO("mysql:host=$servidor;dbname=$base_de_datos;charset=utf8", $usuario,$contrasena);
 
+    // configura pdo para que muestre excepciones si ocurre algún error
+    $conexion_sql->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+}
+catch(PDOException $error)
+{
+    // si falla la conexión, detiene la ejecución y muestra el motivo
+    die("error de conexión: " . $error->getMessage());
+}
 ?>
