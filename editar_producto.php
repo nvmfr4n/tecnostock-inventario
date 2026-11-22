@@ -35,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     $descripcion = $_POST['descripcion'];
     $precio = $_POST['precio'];
     $stock_actual = $_POST['stock_actual'];
+        $stock_original = filter_input(INPUT_POST, 'stock_original', FILTER_VALIDATE_INT);
     $stock_minimo = $_POST['stock_minimo'];
     $id_categoria = $_POST['id_categoria'];
 
@@ -43,32 +44,60 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         $mensaje = "<div class='alerta-error'>error: los valores no pueden ser negativos.</div>";
     }
+    elseif ($stock_original === null || $stock_original === false || $stock_original < 0)
+    {
+        $mensaje = "<div class='alerta-error'>vuelve a abrir el formulario antes de guardar.</div>";
+    }
     else
     {
-        // actualiza el registro en la base de datos
-        $actualizar = "UPDATE producto SET 
-                        nombre = ?, descripcion = ?, precio = ?, 
-                        stock_actual = ?, stock_minimo = ?, id_categoria = ? 
-                      WHERE id_producto = ?";
-        
-        $sentencia_actualizar = $conexion_sql->prepare($actualizar);
-        
         try
         {
-            $sentencia_actualizar->execute([$nombre, $descripcion, $precio, $stock_actual, $stock_minimo, $id_categoria, $id_producto_editar]);
-            $mensaje = "<div class='alerta-exito'>producto actualizado correctamente.</div>";
-            
-            // actualiza los datos en pantalla inmediatamente
-            $producto['nombre'] = $nombre;
-            $producto['descripcion'] = $descripcion;
-            $producto['precio'] = $precio;
-            $producto['stock_actual'] = $stock_actual;
-            $producto['stock_minimo'] = $stock_minimo;
-            $producto['id_categoria'] = $id_categoria;
+            $conexion_sql->beginTransaction();
+
+            // lee el producto y bloquea su fila hasta terminar la edición
+            $sentencia_vigente = $conexion_sql->prepare($consulta . ' for update');
+            $sentencia_vigente->execute([$id_producto_editar]);
+            $producto_vigente = $sentencia_vigente->fetch(PDO::FETCH_ASSOC);
+            $sentencia_vigente->closeCursor();
+
+            if (!$producto_vigente)
+            {
+                $conexion_sql->rollBack();
+                $mensaje = "<div class='alerta-error'>el producto ya no está disponible.</div>";
+            }
+            elseif ((int) $producto_vigente['stock_actual'] !== $stock_original)
+            {
+                $conexion_sql->rollBack();
+                $producto = $producto_vigente;
+                $mensaje = "<div class='alerta-error'>el stock cambió mientras editabas. revisa el stock actual y vuelve a ingresar tus cambios.</div>";
+            }
+            else
+            {
+                $actualizar = "update producto
+                    set nombre = ?, descripcion = ?, precio = ?,
+                        stock_actual = ?, stock_minimo = ?, id_categoria = ?
+                    where id_producto = ? and estado = 1";
+                $sentencia_actualizar = $conexion_sql->prepare($actualizar);
+                $sentencia_actualizar->execute([
+                    $nombre, $descripcion, $precio, $stock_actual, $stock_minimo,
+                    $id_categoria, $id_producto_editar
+                ]);
+                $sentencia->execute([$id_producto_editar]);
+                $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
+                $conexion_sql->commit();
+
+                $mensaje = "<div class='alerta-exito'>producto actualizado correctamente.</div>";
+            }
         }
         catch (PDOException $error)
         {
-            $mensaje = "<div class='alerta-error'>error al actualizar: " . $error->getMessage() . "</div>";
+            if ($conexion_sql->inTransaction())
+            {
+                $conexion_sql->rollBack();
+            }
+
+            error_log($error->getMessage());
+            $mensaje = "<div class='alerta-error'>no se pudo actualizar el producto.</div>";
         }
     }
 }
@@ -104,6 +133,9 @@ $categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- rellena los input con los datos extraídos de la base de datos -->
         <form method="POST" action="" class="formulario-producto">
+            <input type="hidden" name="stock_original"
+            value="<?php echo (int) $producto['stock_actual']; ?>">
+
             <label>Nombre del Producto:</label>
             <input type="text" name="nombre" value="<?php echo htmlspecialchars($producto['nombre']); ?>" required>
 
