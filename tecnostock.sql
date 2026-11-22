@@ -124,9 +124,12 @@ ALTER TABLE `movimiento`
 --
 -- Indices de la tabla `producto`
 --
-ALTER TABLE `producto`
-  ADD PRIMARY KEY (`id_producto`),
-  ADD KEY `id_categoria` (`id_categoria`);
+alter table `producto`
+  add primary key (`id_producto`),
+  add unique key `uq_producto_codigo` (`codigo`),
+  add key `id_categoria` (`id_categoria`),
+  add constraint `chk_producto_no_negativo`
+    check (precio >= 0 and stock_actual >= 0 and stock_minimo >= 0);
 
 --
 -- Indices de la tabla `usuario`
