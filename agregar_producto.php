@@ -17,8 +17,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     $stock_minimo = $_POST['stock_minimo'];
     $id_categoria = $_POST['id_categoria'];
 
-    // valida que valores numéricos no sean menores a cero
-    if ($precio < 0 || $stock_actual < 0 || $stock_minimo < 0)
+    // trim() ya quitó los espacios de los extremos del código y del nombre
+    if ($codigo === '' || $nombre === '')
+    {
+        $mensaje = "<div class='alerta-error'>Ingresa el código y el nombre del producto.</div>";
+    }
+    // también revisa que el precio y el stock sean mayores o iguales a cero
+    elseif ($precio < 0 || $stock_actual < 0 || $stock_minimo < 0)
     {
         $mensaje = "<div class='alerta-error'>error: precio y stock no pueden ser negativos.</div>";
     } 
@@ -70,7 +75,7 @@ $categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
             <a href="inicio.php">Inicio</a>
             <a href="ver_inventario.php">Ver Inventario</a>
             <a href="agregar_producto.php">Agregar Producto</a>
-            <a href="index.php" class="btn-salir">Cerrar Sesión</a>
+            <?php require __DIR__ . '/boton_cerrar_sesion.php'; ?>
         </div>
     </nav>
 
@@ -113,5 +118,28 @@ $categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
             <button type="submit" class="btn-guardar">Guardar Producto</button>
         </form>
     </div>
+    <script>
+    const formulario = document.querySelector('.formulario-producto');
+    const campos = [formulario.elements.codigo, formulario.elements.nombre];
+
+    // quita el aviso cuando la persona corrige el campo
+    campos.forEach((campo) =>
+    {
+        campo.addEventListener('input', () => campo.setCustomValidity(''));
+    });
+
+    // impide el envío si el código o el nombre tienen solo espacios
+    formulario.addEventListener('submit', (evento) =>
+    {
+        const campoVacio = campos.find((campo) => campo.value.trim() === '');
+
+        if (campoVacio)
+        {
+            evento.preventDefault();
+            campoVacio.setCustomValidity('Escribe un código o un nombre válido en este campo.');
+            campoVacio.reportValidity();
+        }
+    });
+</script>
 </body>
 </html>

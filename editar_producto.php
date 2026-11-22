@@ -12,7 +12,7 @@ if (isset($_GET['id']))
     $id_producto_editar = $_GET['id'];
     
     // busca el producto actual para llenar el formulario
-    $consulta = "SELECT * FROM producto WHERE id_producto = ?";
+    $consulta = "SELECT * FROM producto WHERE id_producto = ? AND estado = 1";
     $sentencia = $conexion_sql->prepare($consulta);
     $sentencia->execute([$id_producto_editar]);
     
@@ -93,7 +93,7 @@ $categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
             <a href="inicio.php">Inicio</a>
             <a href="ver_inventario.php">Ver Inventario</a>
             <a href="agregar_producto.php">Agregar Producto</a>
-            <a href="index.php" class="btn-salir">Cerrar Sesión</a>
+            <?php require __DIR__ . '/boton_cerrar_sesion.php'; ?>
         </div>
     </nav>
 

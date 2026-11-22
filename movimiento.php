@@ -13,9 +13,16 @@ if (!isset($_GET['id'])) die("id no proporcionado");
 $id_producto = $_GET['id'];
 
 // extrae la información del producto para mostrar su nombre y stock actual
-$sentencia = $conexion_sql->prepare("SELECT * FROM producto WHERE id_producto = ?");
+$sentencia = $conexion_sql->prepare("SELECT * FROM producto WHERE id_producto = ? AND estado = 1");
 $sentencia->execute([$id_producto]);
 $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
+
+// detiene la página si el producto no existe o está desactivado
+if (!$producto)
+{
+    http_response_code(404);
+    exit('El producto no existe o está desactivado.');
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
@@ -83,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         <div class="enlaces-menu">
             <a href="inicio.php">Inicio</a>
             <a href="ver_inventario.php">Ver Inventario</a>
-            <a href="index.php" class="btn-salir">Cerrar Sesión</a>
+            <?php require __DIR__ . '/boton_cerrar_sesion.php'; ?>
         </div>
     </nav>
     <div class="contenedor-panel">

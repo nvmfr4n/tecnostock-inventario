@@ -39,8 +39,10 @@ else
     $sentencia->execute();
 }
 
-// guarda todo el resultado en un arreglo
+// guarda los productos encontrados para mostrarlos en la tabla
 $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+$_SESSION['token_desactivar'] ??= bin2hex(random_bytes(32));
+$token_desactivar = $_SESSION['token_desactivar'];
 ?>
 
 <!DOCTYPE html>
@@ -57,8 +59,7 @@ $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
             <a href="inicio.php">Inicio</a>
             <a href="ver_inventario.php">Ver Inventario</a>
             <a href="agregar_producto.php">Agregar Producto</a>
-            <a href="index.php" class="btn-salir">Cerrar Sesión</a>
-        </div>
+        <?php require __DIR__ . '/boton_cerrar_sesion.php'; ?>        </div>
     </nav>
 
     <div class="contenedor-panel">
@@ -105,7 +106,15 @@ $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                             <!-- botones de acciones que envían el id_producto por url -->
                             <a href='movimiento.php?id=<?php echo $fila['id_producto']; ?>' style='background:#198754;color:white;padding:5px;border-radius:4px;text-decoration:none;font-size:14px;'>Movimiento</a>
                             <a href='editar_producto.php?id=<?php echo $fila['id_producto']; ?>' class='btn-editar'>Editar</a> 
-                            <a href='desactivar_producto.php?id=<?php echo $fila['id_producto']; ?>' class='btn-desactivar' onclick='return confirm("¿Desactivar producto?")'>Desactivar</a>
+                            <form method="post" action="desactivar_producto.php"
+                                onsubmit="return confirm('¿Desactivar este producto?');"
+                                style="display: inline-block; width: auto; padding: 0; background: transparent; box-shadow: none;">
+                            <input type="hidden" name="id_producto"
+                                value="<?php echo (int) $fila['id_producto']; ?>">
+                            <input type="hidden" name="token_desactivar"
+                                value="<?php echo htmlspecialchars($token_desactivar, ENT_QUOTES, 'UTF-8'); ?>">
+                            <button type="submit" class="btn-desactivar" style="width: auto;">Desactivar</button>
+                        </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>
