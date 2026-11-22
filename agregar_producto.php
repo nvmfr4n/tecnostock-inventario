@@ -12,21 +12,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     $codigo = trim($_POST['codigo']);
     $nombre = trim($_POST['nombre']);
     $descripcion = trim($_POST['descripcion']);
-    $precio = $_POST['precio'];
-    $stock_actual = $_POST['stock_actual'];
-    $stock_minimo = $_POST['stock_minimo'];
+    $opciones_entero = ['options' => ['min_range' => 0, 'max_range' => 2147483647]];
+    $precio = filter_input(INPUT_POST, 'precio', FILTER_VALIDATE_INT, $opciones_entero);
+    $stock_actual = filter_input(INPUT_POST, 'stock_actual', FILTER_VALIDATE_INT, $opciones_entero);
+    $stock_minimo = filter_input(INPUT_POST, 'stock_minimo', FILTER_VALIDATE_INT, $opciones_entero);
     $id_categoria = $_POST['id_categoria'];
 
     // trim() ya quitó los espacios de los extremos del código y del nombre
     if ($codigo === '' || $nombre === '')
     {
-        $mensaje = "<div class='alerta-error'>Ingresa el código y el nombre del producto.</div>";
+        $mensaje = "<div class='alerta-error'>ingresa el código y el nombre del producto.</div>";
     }
-    // también revisa que el precio y el stock sean mayores o iguales a cero
-    elseif ($precio < 0 || $stock_actual < 0 || $stock_minimo < 0)
+    elseif (!is_int($precio) || !is_int($stock_actual) || !is_int($stock_minimo))
     {
-        $mensaje = "<div class='alerta-error'>error: precio y stock no pueden ser negativos.</div>";
-    } 
+        $mensaje = "<div class='alerta-error'>ingresa números enteros desde cero para el precio y el stock.</div>";
+    }
     else
     {
         try
@@ -53,6 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         }
     }
 }
+
 // consulta las categorías para llenar el desplegable
 $consulta_categorias = $conexion_sql->query(
     "SELECT id_categoria, nombre FROM categoria ORDER BY nombre"
