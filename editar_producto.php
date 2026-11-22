@@ -33,16 +33,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
     $nombre = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
-    $precio = $_POST['precio'];
-    $stock_actual = $_POST['stock_actual'];
-        $stock_original = filter_input(INPUT_POST, 'stock_original', FILTER_VALIDATE_INT);
-    $stock_minimo = $_POST['stock_minimo'];
+    $opciones_entero = ['options' => ['min_range' => 0, 'max_range' => 2147483647]];
+    $precio = filter_input(INPUT_POST, 'precio', FILTER_VALIDATE_INT, $opciones_entero);
+    $stock_actual = filter_input(INPUT_POST, 'stock_actual', FILTER_VALIDATE_INT, $opciones_entero);
+    $stock_original = filter_input(INPUT_POST, 'stock_original', FILTER_VALIDATE_INT);
+    $stock_minimo = filter_input(INPUT_POST, 'stock_minimo', FILTER_VALIDATE_INT, $opciones_entero);
     $id_categoria = $_POST['id_categoria'];
 
-    // valida que no ingresen números negativos
-    if ($precio < 0 || $stock_actual < 0 || $stock_minimo < 0)
+    // valida que el precio y el stock sean enteros desde cero
+    if (!is_int($precio) || !is_int($stock_actual) || !is_int($stock_minimo))
     {
-        $mensaje = "<div class='alerta-error'>error: los valores no pueden ser negativos.</div>";
+        $mensaje = "<div class='alerta-error'>ingresa números enteros desde cero para el precio y el stock.</div>";
     }
     elseif ($stock_original === null || $stock_original === false || $stock_original < 0)
     {
