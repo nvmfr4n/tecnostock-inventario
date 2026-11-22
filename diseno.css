@@ -1,16 +1,20 @@
-/* colores y tipografía de tecnostock */
+/* paleta azul de tecnostock */
 :root {
     color-scheme: light;
-    --fondo: #f4f7fb;
+    --azul-hielo: #e2eff6;
+    --celeste-palido: #b7d7ea;
+    --celeste: #8dbedc;
+    --azul-acero: #64a4ce;
+    --azul-medio: #4893c6;
     --superficie: #fff;
-    --texto: #17263a;
-    --texto-secundario: #526379;
-    --borde: #d8e1eb;
-    --menu: #14253b;
-    --primario: #2456a6;
-    --primario-hover: #194686;
-    --acento: #177269;
-    --sombra: 0 12px 28px rgb(20 37 59 / 7%);
+    --texto: #17364b;
+    --texto-secundario: #3e5b70;
+    --borde: #c4dbe9;
+    --primario: #245674;
+    --primario-hover: #1a4159;
+    --fondo-alerta: #fbe7eb;
+    --texto-alerta: #81283d;
+    --sombra: 0 12px 28px rgb(28 70 100 / 9%);
 }
 
 *, *::before, *::after {
@@ -21,7 +25,7 @@ body {
     margin: 0;
     min-height: 100vh;
     color: var(--texto);
-    background: var(--fondo);
+    background: var(--azul-hielo);
     font: 1rem/1.55 "Segoe UI", system-ui, sans-serif;
 }
 
@@ -31,7 +35,6 @@ h2, h3, p {
 
 h2 {
     font-size: clamp(1.55rem, 1.25rem + 1vw, 2.1rem);
-    font-weight: 700;
     line-height: 1.2;
     letter-spacing: -.025em;
 }
@@ -50,7 +53,7 @@ input:not([type="hidden"]), select {
     min-width: 0;
     min-height: 2.75rem;
     padding: .65rem .8rem;
-    border: 1px solid #aebed0;
+    border: 1px solid #779fb7;
     border-radius: .55rem;
     background: var(--superficie);
     color: var(--texto);
@@ -61,11 +64,12 @@ input::placeholder {
 }
 
 :where(a, button, input, select):focus-visible {
-    outline: 2px solid #2967bd;
+    outline: 2px solid var(--primario);
     outline-offset: 3px;
 }
 
-button, .btn-limpiar, .btn-editar, .tabla-inventario a[href^="movimiento.php?"] {
+button, .btn-limpiar, .btn-editar,
+.tabla-inventario a[href^="movimiento.php?"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -90,16 +94,21 @@ body:not(.body-panel) {
     display: grid;
     place-items: center;
     padding: 1.25rem;
-    background: radial-gradient(ellipse at 20% 15%, #294d66, transparent 55%), var(--menu);
+    background: linear-gradient(
+        135deg,
+        var(--azul-hielo),
+        var(--celeste-palido) 55%,
+        var(--celeste)
+    );
 }
 
 body:not(.body-panel) > form {
     width: min(100%, 27rem);
     padding: clamp(1.25rem, 5vw, 2.5rem);
-    border-top: .35rem solid #3bb2a2;
+    border-top: .35rem solid var(--azul-medio);
     border-radius: 1rem;
     background: var(--superficie);
-    box-shadow: 0 18px 55px rgb(0 0 0 / 26%);
+    box-shadow: var(--sombra);
 }
 
 body:not(.body-panel) > form label {
@@ -117,17 +126,17 @@ body:not(.body-panel) > form > button {
     margin-top: 1.35rem;
 }
 
-/* navegación y resumen */
+/* menú y panel de inicio */
 .menu-superior {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: .6rem 1.5rem;
     flex-wrap: wrap;
+    gap: .6rem 1.5rem;
     padding: .85rem max(1rem, calc((100% - 76rem) / 2));
-    border-bottom: 3px solid #338d85;
-    background: var(--menu);
-    color: #fff;
+    border-bottom: 3px solid var(--azul-acero);
+    background: var(--celeste-palido);
+    color: var(--texto);
 }
 
 .logo-menu {
@@ -144,7 +153,7 @@ body:not(.body-panel) > form > button {
     width: .75rem;
     height: .75rem;
     border-radius: .2rem;
-    background: #64dac8;
+    background: var(--primario);
 }
 
 .enlaces-menu {
@@ -154,33 +163,24 @@ body:not(.body-panel) > form > button {
     gap: .3rem;
 }
 
-.enlaces-menu a, .btn-salir {
+.enlaces-menu a, .enlaces-menu .btn-salir {
     padding: .45rem .65rem;
     border-radius: .45rem;
-    color: #f0f4fa;
+    color: var(--texto);
     font-size: .875rem;
     font-weight: 600;
     text-decoration: none;
 }
 
-.enlaces-menu a:hover, .btn-salir:hover {
-    background: #304762;
-    color: #fff;
-}
-
-.enlaces-menu :focus-visible {
-    outline-color: #a5e6dd;
-}
-
 .enlaces-menu .btn-salir {
     min-height: 2.5rem;
-    margin-left: .25rem !important; /* sustituye el margen en línea */
-    border-color: #8093a9;
+    margin-left: .25rem !important;
+    border-color: #6b95af;
     background: transparent;
 }
 
-.enlaces-menu .btn-salir:hover {
-    background: #304762;
+.enlaces-menu a:hover, .enlaces-menu .btn-salir:hover {
+    background: var(--celeste);
 }
 
 .contenedor-panel {
@@ -200,10 +200,15 @@ body:not(.body-panel) > form > button {
 .tarjeta {
     padding: 1.35rem 1.5rem;
     border: 1px solid var(--borde);
-    border-left: .3rem solid var(--acento);
+    border-left: .3rem solid var(--azul-medio);
     border-radius: .8rem;
     background: var(--superficie);
     box-shadow: var(--sombra);
+}
+
+.tarjeta + .tarjeta {
+    border-left-color: var(--azul-acero);
+    background: var(--celeste-palido);
 }
 
 .tarjeta h3 {
@@ -214,22 +219,14 @@ body:not(.body-panel) > form > button {
 
 .numero-grande {
     margin-top: .35rem;
-    color: var(--acento);
+    color: var(--primario);
     font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
     font-weight: 750;
     line-height: 1.15;
     font-variant-numeric: tabular-nums;
 }
 
-.tarjeta + .tarjeta {
-    border-left-color: #b7671b;
-}
-
-.tarjeta + .tarjeta .numero-grande {
-    color: #8b4c14;
-}
-
-/* formularios de producto y movimientos */
+/* formularios de productos y movimientos */
 .contenedor-panel:has(> .formulario-producto) {
     max-width: 45rem;
 }
@@ -253,7 +250,7 @@ body:not(.body-panel) > form > button {
 }
 
 .formulario-producto select[name="tipo"] {
-    margin-bottom: 0 !important; /* iguala el espaciado del selector de movimientos */
+    margin-bottom: 0 !important;
 }
 
 .formulario-producto .btn-guardar {
@@ -271,18 +268,18 @@ body:not(.body-panel) > form > button {
 }
 
 .alerta-exito {
-    color: #155b48;
-    background: #e5f6ee;
-    border-color: #a0cfb8;
+    color: var(--texto);
+    background: var(--azul-hielo);
+    border-color: var(--azul-acero);
 }
 
 .alerta-error {
-    color: #8b2335;
-    background: #fff0f2;
-    border-color: #efb1ba;
+    color: var(--texto-alerta);
+    background: var(--fondo-alerta);
+    border-color: #dba0ad;
 }
 
-/* búsqueda, tabla y acciones */
+/* búsqueda e inventario */
 .formulario-buscador {
     display: flex;
     gap: .6rem;
@@ -298,13 +295,13 @@ body:not(.body-panel) > form > button {
 }
 
 .btn-limpiar, .btn-editar {
-    color: #283d59;
-    background: #eef3fa;
-    border-color: #b7c8dc;
+    color: var(--texto);
+    background: var(--azul-hielo);
+    border-color: #a5c5d9;
 }
 
 .btn-limpiar:hover, .btn-editar:hover {
-    background: #dfe9f6;
+    background: var(--celeste-palido);
 }
 
 .tabla-inventario {
@@ -326,14 +323,14 @@ body:not(.body-panel) > form > button {
 }
 
 .tabla-inventario th {
-    background: #eaf0f8;
-    color: #334962;
+    color: var(--texto);
+    background: var(--celeste);
     font-size: .8rem;
     font-weight: 700;
 }
 
 .tabla-inventario td {
-    border-top: 1px solid #e6ecf4;
+    border-top: 1px solid var(--borde);
 }
 
 .tabla-inventario td:first-child {
@@ -346,12 +343,16 @@ body:not(.body-panel) > form > button {
 }
 
 .tabla-inventario tbody tr:hover {
-    background: #f3f7fc;
+    background: #f1f8fc;
 }
 
 .tabla-inventario tbody tr.alerta-stock {
-    color: #832438;
-    background: #fff0f2;
+    color: var(--texto-alerta);
+    background: var(--fondo-alerta);
+}
+
+.tabla-inventario .alerta-stock td:first-child {
+    box-shadow: inset .25rem 0 #c76d82;
 }
 
 .tabla-inventario .alerta-stock td:nth-child(6) {
@@ -377,30 +378,30 @@ body:not(.body-panel) > form > button {
 }
 
 .tabla-inventario a[href^="movimiento.php?"] {
-    /* sustituye el estilo en línea del enlace */
+    /* ajusta los estilos en línea del enlace de movimiento */
     padding: .28rem .58rem !important;
     border-radius: .45rem !important;
-    color: #145a51 !important;
-    background: #e3f3ef !important;
-    border-color: #aacfc5;
     font-size: .8rem !important;
+    color: var(--texto) !important;
+    background: var(--celeste-palido) !important;
+    border-color: #a5c5d9;
 }
 
 .tabla-inventario a[href^="movimiento.php?"]:hover {
-    background: #cbe8e1 !important;
+    background: var(--celeste) !important;
 }
 
 .btn-desactivar {
-    color: #8b2335;
-    background: #fff1f3;
-    border-color: #deb2ba;
+    color: var(--texto-alerta);
+    background: var(--fondo-alerta);
+    border-color: #dba0ad;
 }
 
 .btn-desactivar:hover {
-    background: #fbe0e5;
+    background: #f5d4dc;
 }
 
-/* ajustes para pantallas pequeñas */
+/* ajustes para ventanas angostas */
 @media (max-width: 58rem) {
     .tabla-inventario {
         display: block;
