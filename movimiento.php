@@ -39,39 +39,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     {
         $mensaje = "<div class='alerta-error'>La cantidad debe ser un número entero mayor que cero.</div>";
     }
-    elseif ($tipo == 'Salida' && $cantidad > $producto['stock_actual'])
-    {
-        // previene vender o sacar más de lo que hay
-        $mensaje = "<div class='alerta-error'>error: la salida no puede superar el stock actual (stock: {$producto['stock_actual']}).</div>";
-    }
     else
     {
-        try 
+        try
         {
-            // inicia una transacción: si un paso falla, revierte todo para no dañar los datos
             $conexion_sql->beginTransaction();
 
-            // paso 1: registra el historial de movimiento
-            $sentencia_movimiento = $conexion_sql->prepare("INSERT INTO movimiento (fecha_hora, tipo, cantidad, observacion, id_producto, id_usuario) VALUES (NOW(), ?, ?, ?, ?, ?)");
+            // lee y bloquea el producto hasta confirmar o revertir el movimiento
+            $consulta_stock = $conexion_sql->prepare(
+                "select stock_actual from producto where id_producto = ? and estado = 1 for update"
+            );
+            $consulta_stock->execute([$id_producto]);
+            $stock_actual = $consulta_stock->fetchColumn();
+
+            if ($stock_actual === false)
+            {
+                throw new DomainException('el producto ya no está activo.');
+            }
+
+            $stock_actual = (int) $stock_actual;
+            $producto['stock_actual'] = $stock_actual;
+
+            // verifica la salida usando el stock vigente dentro de la transacción
+            if ($tipo === 'Salida' && $cantidad > $stock_actual)
+            {
+                throw new DomainException("la salida supera el stock disponible ($stock_actual).");
+            }
+
+            if ($tipo === 'Entrada' && $cantidad > 2147483647 - $stock_actual)
+            {
+                throw new DomainException('la entrada supera el stock máximo permitido.');
+            }
+
+            $nuevo_stock = ($tipo === 'Entrada')
+                ? $stock_actual + $cantidad
+                : $stock_actual - $cantidad;
+
+            // guarda el movimiento y cambia el stock en la misma transacción
+            $sentencia_movimiento = $conexion_sql->prepare(
+                "insert into movimiento (fecha_hora, tipo, cantidad, observacion, id_producto, id_usuario)
+                values (now(), ?, ?, ?, ?, ?)"
+            );
             $sentencia_movimiento->execute([$tipo, $cantidad, $observacion, $id_producto, $_SESSION['id_usuario']]);
 
-            // paso 2: recalcula y guarda el nuevo stock general del producto
-            $nuevo_stock = ($tipo == 'Entrada') ? ($producto['stock_actual'] + $cantidad) : ($producto['stock_actual'] - $cantidad);
-            $sentencia_producto = $conexion_sql->prepare("UPDATE producto SET stock_actual = ? WHERE id_producto = ?");
+            $sentencia_producto = $conexion_sql->prepare(
+                "update producto set stock_actual = ? where id_producto = ?"
+            );
             $sentencia_producto->execute([$nuevo_stock, $id_producto]);
 
-            // confirma la transacción y aplica los cambios reales
             $conexion_sql->commit();
-            // guarda el aviso y vuelve a abrir la página sin reenviar el formulario
-            $_SESSION['mensaje_movimiento'] = "<div class='alerta-exito'>Movimiento registrado. Stock actualizado a: $nuevo_stock.</div>";
+
+            // vuelve al formulario para evitar registrar el movimiento al recargar
+            $_SESSION['mensaje_movimiento'] = "<div class='alerta-exito'>movimiento registrado. stock actualizado a: $nuevo_stock.</div>";
             header('Location: movimiento.php?id=' . (int) $id_producto, true, 303);
             exit;
         }
-        catch (Exception $error) 
+        catch (Exception $error)
         {
-            // revierte la transacción en caso de error
-            $conexion_sql->rollBack();
-            $mensaje = "<div class='alerta-error'>error: " . $error->getMessage() . "</div>";
+            // revierte los cambios si la transacción todavía está abierta
+            if ($conexion_sql->inTransaction())
+            {
+                $conexion_sql->rollBack();
+            }
+
+            if ($error instanceof DomainException)
+            {
+                $mensaje = "<div class='alerta-error'>" . $error->getMessage() . "</div>";
+            }
+            else
+            {
+                error_log($error->getMessage());
+                $mensaje = "<div class='alerta-error'>no se pudo registrar el movimiento.</div>";
+            }
         }
     }
 }
