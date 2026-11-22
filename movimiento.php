@@ -4,7 +4,9 @@ session_start();
 if(!isset($_SESSION['id_usuario'])) { header("Location: index.php"); exit(); }
 include 'conexion.php';
 
-$mensaje = "";
+// muestra una sola vez el aviso del movimiento anterior
+$mensaje = $_SESSION['mensaje_movimiento'] ?? '';
+unset($_SESSION['mensaje_movimiento']);
 
 // asegura que llegue un id válido
 if (!isset($_GET['id'])) die("id no proporcionado");
@@ -17,14 +19,18 @@ $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
-    $tipo = $_POST['tipo']; 
-    $cantidad = $_POST['cantidad'];
-    $observacion = $_POST['observacion'];
+    $tipo = $_POST['tipo'] ?? '';
+    $cantidad = filter_var($_POST['cantidad'] ?? '', FILTER_VALIDATE_INT);
+    $observacion = $_POST['observacion'] ?? '';
 
-    // valida cantidades coherentes
-    if ($cantidad <= 0)
+// valida el tipo y exige una cantidad entera mayor que cero
+    if (!in_array($tipo, ['Entrada', 'Salida'], true))
     {
-        $mensaje = "<div class='alerta-error'>la cantidad debe ser mayor a cero.</div>";
+        $mensaje = "<div class='alerta-error'>Selecciona Entrada o Salida.</div>";
+    }
+    elseif ($cantidad === false || $cantidad < 1)
+    {
+        $mensaje = "<div class='alerta-error'>La cantidad debe ser un número entero mayor que cero.</div>";
     }
     elseif ($tipo == 'Salida' && $cantidad > $producto['stock_actual'])
     {
@@ -49,8 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
             // confirma la transacción y aplica los cambios reales
             $conexion_sql->commit();
-            $mensaje = "<div class='alerta-exito'>movimiento registrado. stock actualizado a: $nuevo_stock.</div>";
-            $producto['stock_actual'] = $nuevo_stock; // actualiza visualmente en pantalla
+            // guarda el aviso y vuelve a abrir la página sin reenviar el formulario
+            $_SESSION['mensaje_movimiento'] = "<div class='alerta-exito'>Movimiento registrado. Stock actualizado a: $nuevo_stock.</div>";
+            header('Location: movimiento.php?id=' . (int) $id_producto, true, 303);
+            exit;
         }
         catch (Exception $error) 
         {
