@@ -130,7 +130,6 @@ alter table `producto`
   add key `id_categoria` (`id_categoria`),
   add constraint `chk_producto_no_negativo`
     check (precio >= 0 and stock_actual >= 0 and stock_minimo >= 0);
-
 --
 -- Indices de la tabla `usuario`
 --
@@ -181,6 +180,22 @@ ALTER TABLE `movimiento`
 --
 ALTER TABLE `producto`
   ADD CONSTRAINT `producto_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`);
+
+  -- agrega las categorías que todavía no existen
+insert into categoria (nombre, descripcion, estado)
+select nuevas.nombre, nuevas.descripcion, 1
+from (
+    select 'Teclados' as nombre, 'Teclados mecánicos y de membrana' as descripcion
+    union all select 'Ratones', 'Ratones con cable e inalámbricos'
+    union all select 'Audio', 'Audífonos, parlantes y micrófonos'
+    union all select 'Mandos', 'Controles para pc y consolas'
+    union all select 'Monitores', 'Pantallas para computador'
+) as nuevas
+where not exists (
+    select 1 from categoria
+    where categoria.nombre = nuevas.nombre
+);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
