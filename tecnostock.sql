@@ -196,6 +196,10 @@ where not exists (
     where categoria.nombre = nuevas.nombre
 );
 
+alter table movimiento
+  add constraint chk_movimiento_cantidad_positiva
+  check (cantidad > 0);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
