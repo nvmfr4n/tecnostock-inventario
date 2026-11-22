@@ -15,15 +15,26 @@ if (isset($_GET['busqueda']) && $_GET['busqueda'] != "")
     // agrega los porcentajes necesarios para la búsqueda en sql
     $termino_busqueda = '%' . $texto_ingresado . '%'; 
     
-    // busca coincidencias en código, nombre o categoría
-    $consulta = "SELECT * FROM producto WHERE estado = 1 AND (codigo LIKE ? OR nombre LIKE ? OR id_categoria LIKE ?)";
+    // une cada producto con su categoría para buscar por el nombre de la categoría
+    $consulta = "SELECT producto.*, categoria.nombre AS nombre_categoria
+                FROM producto
+                INNER JOIN categoria
+                    ON producto.id_categoria = categoria.id_categoria
+                WHERE producto.estado = 1
+                    AND (producto.codigo LIKE ?
+                        OR producto.nombre LIKE ?
+                        OR categoria.nombre LIKE ?)";
     $sentencia = $conexion_sql->prepare($consulta);
     $sentencia->execute([$termino_busqueda, $termino_busqueda, $termino_busqueda]);
 }
 else
 {
-    // si no hay búsqueda, solicita todos los productos activos
-    $consulta = "SELECT * FROM producto WHERE estado = 1";
+    // obtiene los productos activos junto con el nombre de su categoría
+    $consulta = "SELECT producto.*, categoria.nombre AS nombre_categoria
+                FROM producto
+                INNER JOIN categoria
+                    ON producto.id_categoria = categoria.id_categoria
+                WHERE producto.estado = 1";
     $sentencia = $conexion_sql->prepare($consulta);
     $sentencia->execute();
 }
@@ -66,6 +77,7 @@ $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                 <tr>
                     <th>Código</th>
                     <th>Nombre</th>
+                    <th>Categoría</th>
                     <th>Descripción</th>
                     <th>Precio</th>
                     <th>Stock Actual</th>
@@ -84,6 +96,7 @@ $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                     <tr class='<?php echo $clase_alerta; ?>'>
                         <td><?php echo htmlspecialchars($fila['codigo']); ?></td>
                         <td><?php echo htmlspecialchars($fila['nombre']); ?></td>
+                        <td><?php echo htmlspecialchars($fila['nombre_categoria']); ?></td>
                         <td><?php echo htmlspecialchars($fila['descripcion']); ?></td>
                         <td>$<?php echo number_format($fila['precio'], 0, ',', '.'); ?></td>
                         <td><?php echo $fila['stock_actual']; ?></td>
@@ -98,7 +111,7 @@ $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                 <?php else: ?>
                     <!-- mensaje si la tabla o búsqueda está vacía -->
-                    <tr><td colspan='7' style='text-align:center;'>no se encontraron productos activos.</td></tr>
+                    <tr><td colspan='8' style='text-align:center;'>no se encontraron productos activos.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

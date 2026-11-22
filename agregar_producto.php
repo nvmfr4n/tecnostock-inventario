@@ -48,6 +48,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         }
     }
 }
+// consulta las categorías para llenar el desplegable
+$consulta_categorias = $conexion_sql->query(
+    "SELECT id_categoria, nombre FROM categoria ORDER BY nombre"
+);
+$categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -94,8 +99,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             <label>Stock Mínimo (Alerta):</label>
             <input type="number" name="stock_minimo" required>
 
-            <label>ID Categoría (Ej: 1):</label>
-            <input type="number" name="id_categoria" required>
+            <label for="id_categoria">Categoría:</label>
+            <select id="id_categoria" name="id_categoria" required>
+                <option value="">Selecciona una categoría</option>
+
+                <?php foreach ($categorias as $categoria): ?>
+                    <option value="<?php echo (int) $categoria['id_categoria']; ?>">
+                        <?php echo htmlspecialchars($categoria['nombre']); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
             <button type="submit" class="btn-guardar">Guardar Producto</button>
         </form>

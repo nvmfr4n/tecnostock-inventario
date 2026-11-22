@@ -7,6 +7,16 @@ if(!isset($_SESSION['id_usuario']))
     header("Location: index.php"); exit();
 }
 include 'conexion.php';
+
+// cuenta los productos activos y los que están por debajo de su stock mínimo
+$consulta_resumen = $conexion_sql->query
+(
+    "SELECT COUNT(*) AS total_productos,
+            COUNT(CASE WHEN stock_actual < stock_minimo THEN 1 END) AS alertas_stock
+     FROM producto
+     WHERE estado = 1"
+);
+$resumen = $consulta_resumen->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -36,11 +46,11 @@ include 'conexion.php';
         <div class="tarjetas-resumen">
             <div class="tarjeta">
                 <h3>Total Productos</h3>
-                <p class="numero-grande">0</p>
+                <p class="numero-grande"><?php echo (int) $resumen['total_productos']; ?></p>
             </div>
             <div class="tarjeta">
                 <h3>Alertas de Stock</h3>
-                <p class="numero-grande">0</p>
+                <p class="numero-grande"><?php echo (int) $resumen['alertas_stock']; ?></p>
             </div>
         </div>
     </div>

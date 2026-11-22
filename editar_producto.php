@@ -72,6 +72,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         }
     }
 }
+// consulta los nombres y los identificadores para llenar el desplegable
+$consulta_categorias = $conexion_sql->query(
+    "SELECT id_categoria, nombre FROM categoria ORDER BY nombre"
+);
+$categorias = $consulta_categorias->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -114,8 +119,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             <label>Stock Mínimo (Alerta):</label>
             <input type="number" name="stock_minimo" value="<?php echo $producto['stock_minimo']; ?>" required>
 
-            <label>ID Categoría:</label>
-            <input type="number" name="id_categoria" value="<?php echo $producto['id_categoria']; ?>" required>
+            <label for="id_categoria">Categoría:</label>
+            <select id="id_categoria" name="id_categoria" required>
+                <?php foreach ($categorias as $categoria): ?>
+                    <?php
+                    // deja seleccionada la categoría que ya tiene el producto
+                    $seleccionada = (int) $categoria['id_categoria'] === (int) $producto['id_categoria'];
+                    ?>
+                    <option value="<?php echo (int) $categoria['id_categoria']; ?>"
+                        <?php echo $seleccionada ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($categoria['nombre']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
 
             <button type="submit" class="btn-guardar">Actualizar Producto</button>
         </form>
